@@ -15,114 +15,158 @@ const (
 	JumpIfFalseOpcode = 6
 	LessThanOpcode    = 7
 	EqualsOpcode      = 8
+	RelOffsetOpcode   = 9
 	HaltOpcode        = 99
 )
 
 const (
 	PositionMode  = 0
 	ImmediateMode = 1
+	RelativeMode  = 2
 )
 
 type Config struct {
-	Noun  nulls.Int
-	Verb  nulls.Int
-	Input int
+	Noun   nulls.Int
+	Verb   nulls.Int
+	Input  <-chan Word
+	Output chan<- Word
 }
 
 type process struct {
-	mem []int
-	pos int
+	mem map[Word]Word
+	pos Word
+	rel Word
 }
 
-func (proc *process) next() int {
-	val := proc.mem[proc.pos]
+func (proc *process) read(addr Word) Word {
+	return proc.mem[addr]
+}
+
+func (proc *process) write(addr Word, value Word) {
+	proc.mem[addr] = value
+}
+
+func (proc *process) next() Word {
+	val := proc.read(proc.pos)
 	proc.pos++
 	return val
 }
 
-func Exec(program []int, cfg *Config) (exit int, output []int, err error) {
+func Exec(program Program, cfg *Config) (exit Word, err error) {
+	if cfg.Output == nil {
+		cfg.Output = make(chan Word)
+	}
+	defer close(cfg.Output)
+
 	proc := process{}
-	proc.mem = append(proc.mem, program...)
+	proc.mem = make(map[Word]Word, len(program))
+	for addr, value := range program {
+		proc.mem[Word(addr)] = value
+	}
 
 	if cfg.Noun.Valid && len(proc.mem) > 1 {
-		proc.mem[1] = cfg.Noun.Int
+		proc.write(1, Word(cfg.Noun.Int))
 	}
 	if cfg.Verb.Valid && len(proc.mem) > 2 {
-		proc.mem[2] = cfg.Verb.Int
+		proc.write(2, Word(cfg.Verb.Int))
 	}
 
-loop:
 	for {
 		instr := proc.next()
 		opcode := instr % 100
 		modes := instr / 100
 
-		nextArg := func() int {
+		param := func(dest bool) Word {
 			v := proc.next()
 			m := modes % 10
 			modes /= 10
-			if m == PositionMode {
-				v = proc.mem[v]
+			switch m {
+			case ImmediateMode:
+				return v
+			case RelativeMode:
+				v += proc.rel
+			}
+			if !dest {
+				v = proc.read(v)
 			}
 			return v
 		}
 
+		operand := func() Word {
+			return param(false)
+		}
+
+		destination := func() Word {
+			return param(true)
+		}
+
 		switch opcode {
 		case AddOpcode:
-			a := nextArg()
-			b := nextArg()
-			dest := proc.next()
-			proc.mem[dest] = a + b
+			a := operand()
+			b := operand()
+			dest := destination()
+			proc.write(dest, a+b)
+
 		case MultOpcode:
-			a := nextArg()
-			b := nextArg()
-			dest := proc.next()
-			proc.mem[dest] = a * b
+			a := operand()
+			b := operand()
+			dest := destination()
+			proc.write(dest, a*b)
+
 		case InputOpcode:
-			in := cfg.Input
-			dest := proc.next()
-			proc.mem[dest] = in
+			dest := destination()
+			input := <-cfg.Input
+			proc.write(dest, input)
+
 		case OutputOpcode:
-			out := nextArg()
-			output = append(output, out)
+			output := operand()
+			cfg.Output <- output
+
 		case JumpIfTrueOpcode:
-			val := nextArg()
-			pos := nextArg()
+			val := operand()
+			pos := operand()
 			if val != 0 {
 				proc.pos = pos
 			}
+
 		case JumpIfFalseOpcode:
-			val := nextArg()
-			pos := nextArg()
+			val := operand()
+			pos := operand()
 			if val == 0 {
 				proc.pos = pos
 			}
+
 		case LessThanOpcode:
-			a := nextArg()
-			b := nextArg()
-			dest := proc.next()
-			val := 0
+			a := operand()
+			b := operand()
+			dest := destination()
+			val := Word(0)
 			if a < b {
 				val = 1
 			}
-			proc.mem[dest] = val
+			proc.write(dest, val)
+
 		case EqualsOpcode:
-			a := nextArg()
-			b := nextArg()
-			dest := proc.next()
-			val := 0
+			a := operand()
+			b := operand()
+			dest := destination()
+			val := Word(0)
 			if a == b {
 				val = 1
 			}
-			proc.mem[dest] = val
+			proc.write(dest, val)
+
+		case RelOffsetOpcode:
+			val := operand()
+			proc.rel += val
+
 		case HaltOpcode:
-			break loop
+			exit = proc.read(0)
+			return
+
 		default:
 			err = fmt.Errorf("unexpected opcode %d at position %d", opcode, proc.pos)
 			return
 		}
 	}
-
-	exit = proc.mem[0]
-	return
 }

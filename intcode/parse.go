@@ -5,17 +5,20 @@ import (
 	"strings"
 )
 
-func Parse(in string) ([]int, error) {
+type Word int64
+type Program []Word
+
+func Parse(in string) (Program, error) {
 	opstrs := strings.Split(in, ",")
-	program := make([]int, 0, len(opstrs))
+	program := Program{}
 
 	for _, opstr := range opstrs {
-		opcode, err := strconv.Atoi(opstr)
+		opcode, err := strconv.ParseInt(opstr, 10, 64)
 		if err != nil {
-			return []int{}, err
+			return Program{}, err
 		}
 
-		program = append(program, opcode)
+		program = append(program, Word(opcode))
 	}
 
 	return program, nil

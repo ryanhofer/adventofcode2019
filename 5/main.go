@@ -10,20 +10,39 @@ import (
 func main() {
 	var err error
 	var cfg *intcode.Config
-	var output []int
+	var in, out chan intcode.Word
 
 	program, err := intcode.Parse(input.Contents())
 	check(err)
 
-	cfg = &intcode.Config{Input: 1}
-	_, output, err = intcode.Exec(program, cfg)
+	in = make(chan intcode.Word, 10)
+	out = make(chan intcode.Word, 10)
+	cfg = &intcode.Config{
+		Input:  in,
+		Output: out,
+	}
+	in <- 1
+	_, err = intcode.Exec(program, cfg)
 	check(err)
-	fmt.Println("Part 1:", output[len(output)-1])
 
-	cfg = &intcode.Config{Input: 5}
-	_, output, err = intcode.Exec(program, cfg)
+	var finalOutput intcode.Word
+	for finalOutput = range out {
+	}
+	fmt.Println("Part 1:", finalOutput)
+
+	in = make(chan intcode.Word, 10)
+	out = make(chan intcode.Word, 10)
+	cfg = &intcode.Config{
+		Input:  in,
+		Output: out,
+	}
+	in <- 5
+	_, err = intcode.Exec(program, cfg)
 	check(err)
-	fmt.Println("Part 2:", output[len(output)-1])
+
+	for finalOutput = range out {
+	}
+	fmt.Println("Part 2:", finalOutput)
 }
 
 func check(err error) {
