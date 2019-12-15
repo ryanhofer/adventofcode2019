@@ -17,8 +17,7 @@ func part1() {
 	program, err := intcode.Parse(input.Contents())
 	check(err)
 
-	out := make(chan intcode.Word)
-	_ = startProgram(program, nil, out)
+	_, out, _ := intcode.Spawn(program)
 
 	screen := arcade.Screen{}
 	for output := range out {
@@ -44,9 +43,7 @@ func part2() {
 	// Insert quarters
 	program[0] = 2
 
-	in := make(chan intcode.Word)
-	out := make(chan intcode.Word)
-	done := startProgram(program, in, out)
+	in, out, halt := intcode.Spawn(program)
 
 	var ballX, paddleX int
 	var nextInput intcode.Word
@@ -59,7 +56,8 @@ gameloop:
 		var output intcode.Word
 
 		select {
-		case <-done:
+		case err := <-halt:
+			check(err)
 			break gameloop
 		case in <- nextInput:
 			continue gameloop
@@ -91,22 +89,6 @@ gameloop:
 	}
 
 	fmt.Println("Part 2:", score)
-}
-
-func startProgram(program intcode.Program, in, out chan intcode.Word) <-chan bool {
-	done := make(chan bool)
-
-	go func(in <-chan intcode.Word, out chan<- intcode.Word) {
-		cfg := &intcode.Config{
-			Input:  in,
-			Output: out,
-		}
-		_, err := intcode.Exec(program, cfg)
-		check(err)
-		done <- true
-	}(in, out)
-
-	return done
 }
 
 func check(err error) {

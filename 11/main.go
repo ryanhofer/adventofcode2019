@@ -42,63 +42,49 @@ func startHullPaintingRobot() {
 	program, err := intcode.Parse(input.Contents())
 	check(err)
 
-	in := make(chan intcode.Word)
-	out := make(chan intcode.Word)
+	in, out, halt := intcode.Spawn(program)
 
-	done := make(chan bool)
+	bot := Robot{
+		pos: Coord{0, 0},
+		dir: Up,
+	}
 
-	go func(in <-chan intcode.Word, out chan<- intcode.Word) {
-		cfg := &intcode.Config{
-			Input:  in,
-			Output: out,
-		}
-		_, err := intcode.Exec(program, cfg)
-		check(err)
-		done <- true
-	}(in, out)
-
-	go func() {
-		bot := Robot{
-			pos: Coord{0, 0},
-			dir: Up,
+	for {
+		select {
+		case err := <-halt:
+			check(err)
+			return
+		case in <- intcode.Word(hull[bot.pos]):
 		}
 
-		for {
-			// input current panel color
-			panelColor := hull[bot.pos]
-			in <- intcode.Word(panelColor)
+		// repaint it
+		newColor := Color(<-out)
+		hull[bot.pos] = newColor
 
-			// repaint it
-			newColor := Color(<-out)
-			hull[bot.pos] = newColor
-
-			if debug {
-				fmt.Printf("PAINT [%d,%d]\n", bot.pos.X, bot.pos.Y)
-			}
-
-			// rotate
-			switch <-out {
-			case 0:
-				bot.dir = bot.dir.CCW()
-			case 1:
-				bot.dir = bot.dir.CW()
-			}
-
-			// move
-			switch bot.dir {
-			case Up:
-				bot.pos.Y--
-			case Right:
-				bot.pos.X++
-			case Down:
-				bot.pos.Y++
-			case Left:
-				bot.pos.X--
-			}
+		if debug {
+			fmt.Printf("PAINT [%d,%d]\n", bot.pos.X, bot.pos.Y)
 		}
-	}()
 
-	<-done
+		// rotate
+		switch <-out {
+		case 0:
+			bot.dir = bot.dir.CCW()
+		case 1:
+			bot.dir = bot.dir.CW()
+		}
+
+		// move
+		switch bot.dir {
+		case Up:
+			bot.pos.Y--
+		case Right:
+			bot.pos.X++
+		case Down:
+			bot.pos.Y++
+		case Left:
+			bot.pos.X--
+		}
+	}
 }
 
 func printTheHull() {
