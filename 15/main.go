@@ -42,8 +42,9 @@ func main() {
 			}
 		}
 
+		// Watch that repair droid go!
 		// printMaze()
-		// time.Sleep(20 * time.Millisecond)
+		// time.Sleep(50 * time.Millisecond)
 
 		if len(unexplored) == 0 {
 			break
@@ -65,6 +66,21 @@ func main() {
 	path, err := pathfind(start, goal)
 	check(err)
 	fmt.Println("Part 1:", len(path)-1)
+
+	// Find furthest point from oxygen system
+	var farthest int
+	for c, t := range maze {
+		if t != Traversable {
+			continue
+		}
+		path, err := pathfind(goal, c)
+		check(err)
+		distance := len(path) - 1
+		if distance > farthest {
+			farthest = distance
+		}
+	}
+	fmt.Println("Part 2:", farthest)
 }
 
 func findGoalCoord() Coord {
