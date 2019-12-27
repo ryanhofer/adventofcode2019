@@ -5,6 +5,6 @@ type Node interface {
 }
 
 type Edge interface {
-	Nodes() (Node, Node)
+	Nodes() (from, to Node)
 	Cost() float64
 }
