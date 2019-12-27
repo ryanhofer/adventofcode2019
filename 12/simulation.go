@@ -63,7 +63,7 @@ func findCycleLength() int {
 		}
 	}
 
-	return imath.LCM(cycle.x, imath.LCM(cycle.y, cycle.z))
+	return imath.LCM(cycle.x, cycle.y, cycle.z)
 }
 
 func step() {

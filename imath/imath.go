@@ -27,7 +27,11 @@ func GCD(a, b int) int {
 	return a
 }
 
-// LCM returns the least common multiple of a, b.
-func LCM(a, b int) int {
-	return a * b / GCD(a, b)
+// LCM returns the least common multiple of its arguments.
+func LCM(a, b int, rest ...int) int {
+	k := a * b / GCD(a, b)
+	if len(rest) == 0 {
+		return k
+	}
+	return LCM(k, rest[0], rest[1:]...)
 }
