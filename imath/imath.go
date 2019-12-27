@@ -18,3 +18,16 @@ func Cmp(a, b int) int {
 	}
 	return 0
 }
+
+// GCD returns the greatest common divisor of a, b.
+func GCD(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+// LCM returns the least common multiple of a, b.
+func LCM(a, b int) int {
+	return a * b / GCD(a, b)
+}

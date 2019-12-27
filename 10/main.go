@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"sort"
+
+	"github.com/ryanhofer/adventofcode2019/imath"
 )
 
 const width = 26
@@ -127,4 +129,18 @@ func checkVisible(fromX, fromY, toX, toY int) bool {
 		x, y = x+dx, y+dy
 	}
 	return true
+}
+
+func norm(x, y int) (int, int) {
+	if x == 0 && y == 0 {
+		return x, y
+	}
+	if x == 0 {
+		return x, y / imath.Abs(y)
+	}
+	if y == 0 {
+		return x / imath.Abs(x), y
+	}
+	d := imath.GCD(imath.Abs(x), imath.Abs(y))
+	return x / d, y / d
 }

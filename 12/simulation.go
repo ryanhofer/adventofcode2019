@@ -1,5 +1,7 @@
 package main
 
+import "github.com/ryanhofer/adventofcode2019/imath"
+
 func totalEnergy() int {
 	totalEnergy := 0
 	for i := range moons {
@@ -61,7 +63,7 @@ func findCycleLength() int {
 		}
 	}
 
-	return lcm(cycle.x, lcm(cycle.y, cycle.z))
+	return imath.LCM(cycle.x, imath.LCM(cycle.y, cycle.z))
 }
 
 func step() {
