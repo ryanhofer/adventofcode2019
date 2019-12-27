@@ -36,16 +36,6 @@ func printState(t int) {
 	}
 }
 
-func cmp(a, b int) int {
-	if a < b {
-		return 1
-	}
-	if a > b {
-		return -1
-	}
-	return 0
-}
-
 func abs(x int) int {
 	if x < 0 {
 		return -x

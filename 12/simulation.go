@@ -32,8 +32,8 @@ func findCycleLength() int {
 
 		var diff vec3
 		for i := range moons {
-			dp := initial[i].pos.cmp(moons[i].pos)
-			dv := initial[i].vel.cmp(moons[i].vel)
+			dp := initial[i].pos.cmp(moons[i].pos).negate()
+			dv := initial[i].vel.cmp(moons[i].vel).negate()
 
 			if dp.x != 0 || dv.x != 0 {
 				diff.x = 1
@@ -72,7 +72,7 @@ func step() {
 				continue
 			}
 			m1, m2 := &moons[i], &moons[j]
-			dv := m1.pos.cmp(m2.pos)
+			dv := m1.pos.cmp(m2.pos).negate()
 			m1.vel = m1.vel.add(dv)
 		}
 	}

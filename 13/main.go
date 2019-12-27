@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ryanhofer/adventofcode2019/arcade"
+	"github.com/ryanhofer/adventofcode2019/imath"
 	"github.com/ryanhofer/adventofcode2019/input"
 	"github.com/ryanhofer/adventofcode2019/intcode"
 )
@@ -81,10 +82,10 @@ gameloop:
 		switch tile {
 		case arcade.Ball:
 			ballX = x
-			nextInput = intcode.Word(cmp(ballX, paddleX))
+			nextInput = intcode.Word(imath.Cmp(ballX, paddleX))
 		case arcade.HorizontalPaddle:
 			paddleX = x
-			nextInput = intcode.Word(cmp(ballX, paddleX))
+			nextInput = intcode.Word(imath.Cmp(ballX, paddleX))
 		}
 	}
 
