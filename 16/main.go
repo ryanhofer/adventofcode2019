@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/ryanhofer/adventofcode2019/imath"
 	"github.com/ryanhofer/adventofcode2019/input"
 )
 
@@ -31,7 +32,7 @@ func part1() {
 				out[r] += in[c] * p(r, c)
 			}
 			out[r] %= 10
-			out[r] = abs(out[r])
+			out[r] = imath.Abs(out[r])
 		}
 		in, out = out, in
 	}
@@ -47,13 +48,6 @@ func p(r, c int) int {
 	n := len(pattern)
 	i := (c + 1) / (r + 1)
 	return pattern[i%n]
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func part2() {

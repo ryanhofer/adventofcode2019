@@ -49,9 +49,9 @@ func main() {
 	}
 
 	sort.Sort(ByAngle(targets))
-	for _, t := range targets {
-		fmt.Printf("[%3d,%3d]\n", t.x, t.y)
-	}
+	// for _, t := range targets {
+	// 	fmt.Printf("[%3d,%3d]\n", t.x, t.y)
+	// }
 
 	numVaporized := 0
 	for _, t := range targets {
@@ -63,7 +63,7 @@ func main() {
 		if checkVisible(bestX, bestY, toX, toY) {
 			t.x, t.y = 0, 0
 			numVaporized++
-			fmt.Printf("VAPORIZED #%d at [%3d,%3d]\n", numVaporized, toX, toY)
+			// fmt.Printf("VAPORIZED #%d at [%3d,%3d]\n", numVaporized, toX, toY)
 		}
 		if numVaporized == 200 {
 			fmt.Println("Part 2:", (100*toX + toY))

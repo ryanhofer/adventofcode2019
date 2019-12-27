@@ -1,24 +1,19 @@
 package main
 
+import "github.com/ryanhofer/adventofcode2019/imath"
+
 func norm(x, y int) (int, int) {
 	if x == 0 && y == 0 {
 		return x, y
 	}
 	if x == 0 {
-		return x, y / abs(y)
+		return x, y / imath.Abs(y)
 	}
 	if y == 0 {
-		return x / abs(x), y
+		return x / imath.Abs(x), y
 	}
-	d := gcd(abs(x), abs(y))
+	d := gcd(imath.Abs(x), imath.Abs(y))
 	return x / d, y / d
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func gcd(a, b int) int {

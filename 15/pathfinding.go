@@ -1,6 +1,10 @@
 package main
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/ryanhofer/adventofcode2019/imath"
+)
 
 var ErrPathNotFound = errors.New("path not found")
 
@@ -8,7 +12,7 @@ var ErrPathNotFound = errors.New("path not found")
 func pathfind(start Coord, goal Coord) ([]Coord, error) {
 	// Using Manhattan distance as the heuristic function
 	h := func(c Coord) int {
-		return abs(c.X-goal.X) + abs(c.Y-goal.Y)
+		return imath.Abs(c.X-goal.X) + imath.Abs(c.Y-goal.Y)
 	}
 
 	cameFrom := map[Coord]Coord{}
@@ -82,11 +86,4 @@ func reconstructPath(cameFrom map[Coord]Coord, current Coord) []Coord {
 	}
 
 	return path
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }

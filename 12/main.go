@@ -36,13 +36,6 @@ func printState(t int) {
 	}
 }
 
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 func check(err error) {
 	if err != nil {
 		panic(err)

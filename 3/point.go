@@ -1,5 +1,7 @@
 package main
 
+import "github.com/ryanhofer/adventofcode2019/imath"
+
 type Point struct {
 	X int
 	Y int
@@ -19,12 +21,5 @@ func (p Point) Equals(q Point) bool {
 }
 
 func (p Point) ManhattanDistance(q Point) int {
-	return abs(p.X-q.X) + abs(p.Y-q.Y)
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
+	return imath.Abs(p.X-q.X) + imath.Abs(p.Y-q.Y)
 }

@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ryanhofer/adventofcode2019/imath"
+)
 
 type Moon struct {
 	pos vec3
@@ -12,11 +16,11 @@ func (m *Moon) energy() int {
 }
 
 func (m *Moon) potential() int {
-	return abs(m.pos.x) + abs(m.pos.y) + abs(m.pos.z)
+	return imath.Abs(m.pos.x) + imath.Abs(m.pos.y) + imath.Abs(m.pos.z)
 }
 
 func (m *Moon) kinetic() int {
-	return abs(m.vel.x) + abs(m.vel.y) + abs(m.vel.z)
+	return imath.Abs(m.vel.x) + imath.Abs(m.vel.y) + imath.Abs(m.vel.z)
 }
 
 func (m *Moon) String() string {
