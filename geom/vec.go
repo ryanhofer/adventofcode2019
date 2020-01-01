@@ -7,10 +7,17 @@ type Vec struct {
 	X, Y int
 }
 
-// Add sums two vectors.
+// Add returns v + w.
 func (v Vec) Add(w Vec) Vec {
 	v.X += w.X
 	v.Y += w.Y
+	return v
+}
+
+// Negate returns -v.
+func (v Vec) Negate() Vec {
+	v.X = -v.X
+	v.Y = -v.Y
 	return v
 }
 
